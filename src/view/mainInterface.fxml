@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="root" alignment="CENTER" maxHeight="425.0" maxWidth="600.0" minHeight="425.0" minWidth="600.0" prefHeight="425.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="control.FXMLControllerTP3">
+   <children>
+      <Label text="Hotel Royal Limoilou" textFill="#eec12e">
+         <font>
+            <Font name="Bell MT Bold" size="36.0" />
+         </font>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </Label>
+      <Label text="Gestion Clients-Réservations" textFill="#97958e">
+         <font>
+            <Font name="Arial Bold" size="18.0" />
+         </font>
+         <VBox.margin>
+            <Insets bottom="15.0" />
+         </VBox.margin>
+      </Label>
+      <Button fx:id="connectionButton" mnemonicParsing="false" onAction="#connection" text="Se connecter" />
+      <HBox prefHeight="400.0" prefWidth="200.0">
+         <children>
+            <VBox prefHeight="200.0" prefWidth="300.0">
+               <children>
+                  <Label text="Clients:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TableView fx:id="tableviewClients" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="columnIdClient" prefWidth="75.0" text="ID" />
+                      <TableColumn fx:id="columnNomClient" prefWidth="112.0" text="Nom" />
+                        <TableColumn fx:id="columnPrenomClient" prefWidth="111.0" text="Prenom" />
+                    </columns>
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
+                  </TableView>
+                  <HBox>
+                     <children>
+                        <Button fx:id="buttonModifClient" disable="true" mnemonicParsing="false" onAction="#consultModifClient" text="Consulter/Modifier">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <Button fx:id="buttonAjouterClient" disable="true" mnemonicParsing="false" onAction="#ajouterClient" text="Ajouter un client">
+                     <VBox.margin>
+                        <Insets top="15.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+               <HBox.margin>
+                  <Insets left="25.0" right="30.0" />
+               </HBox.margin>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="225.0">
+               <children>
+                  <Label text="Reservations:">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TableView fx:id="tableviewReservations" maxWidth="220.0" prefHeight="200.0" prefWidth="200.0">
+                     <columns>
+                        <TableColumn fx:id="columnDebutReserv" prefWidth="85.0" text="Debut" />
+                        <TableColumn fx:id="columnFinReserv" prefWidth="85.0" text="Fin" />
+                        <TableColumn fx:id="columnNoChambreReserv" prefWidth="48.0" text="# Ch." />
+                     </columns>
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
+                  </TableView>
+                  <HBox>
+                     <children>
+                        <Button fx:id="buttonModifReserv" disable="true" mnemonicParsing="false" onAction="#consultModifReserv" text="Consulter/Modifier">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </HBox>
+                  <Button fx:id="buttonAjouterReservation" disable="true" mnemonicParsing="false" onAction="#ajouterReservation" text="Ajouter une reservation">
+                     <VBox.margin>
+                        <Insets top="15.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </children>
+</VBox>

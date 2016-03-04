@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" maxHeight="375.0" maxWidth="400.0" minHeight="375.0" minWidth="400.0" prefHeight="375.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="control.FXMLController_AjouterClient">
+   <children>
+      <Label text="Hotel Royal Limoilou" textFill="#eec12e">
+         <font>
+            <Font name="Bell MT Bold" size="36.0" />
+         </font>
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </Label>
+      <Label text="Ajouter un client" textFill="#97958e">
+         <font>
+            <Font name="Arial Bold" size="18.0" />
+         </font>
+         <VBox.margin>
+            <Insets bottom="15.0" />
+         </VBox.margin>
+      </Label>
+      <GridPane maxWidth="300.0" minWidth="300.0" prefWidth="300.0">
+        <columnConstraints>
+          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="230.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="488.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Nom" />
+            <Label text="Prenom" GridPane.rowIndex="1" />
+            <Label text="ID Client" GridPane.rowIndex="2" />
+            <TextField fx:id="textFieldNom" GridPane.columnIndex="1" />
+            <TextField fx:id="textFieldPrenom" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="textFieldId" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="textFieldTelephone" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="textFieldAdresse" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label text="Telephone" GridPane.rowIndex="3" />
+            <Label text="Adresse" GridPane.rowIndex="4" />
+            <Label text="Date de naissance" GridPane.rowIndex="5" />
+            <Label text="Orientation sexuelle" GridPane.rowIndex="6" />
+            <TextField fx:id="textFieldOrientSex" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <HBox prefHeight="100.0" prefWidth="200.0" />
+            <DatePicker fx:id="datePicker" editable="false" prefHeight="25.0" prefWidth="187.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+         </children>
+      </GridPane>
+      <HBox alignment="CENTER" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="200.0">
+         <children>
+            <Button fx:id="buttonAnnuler" mnemonicParsing="false" onAction="#annuler" text="Annuler">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="buttonAjouter" mnemonicParsing="false" onAction="#ajouter" text="Ajouter">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin></Button>
+         </children>
+      </HBox>
+   </children>
+</VBox>
