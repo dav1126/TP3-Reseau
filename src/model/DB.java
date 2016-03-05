@@ -125,8 +125,7 @@ public class DB {
 												   + pChambreur.getTelephone() + "', '"
 												   + pChambreur.getAdresse() + "', '"
 												   + pChambreur.getDateNaissance() + "', '"
-												   + pChambreur.getOrientationSexuelle()
-												   + "');");
+												   + pChambreur.getOrientationSexuelle()+"');");
 			System.out.println(statut);
 		}
 		catch(SQLException e){
@@ -137,12 +136,12 @@ public class DB {
 	
 	public void modifChambreur(Chambreur pChambreur){
 		try{
-			
+			System.out.println(pChambreur.getIdClient());
 			int statut = statement.executeUpdate(
-					"update chambreur set nom = " + pChambreur.getNom() + ", prenom = " + pChambreur.getPrenom() +
-					", telephone = " + pChambreur.getTelephone() + ", adresse = " + pChambreur.getAdresse() + "dateNaissance = " +
-					pChambreur.getDateNaissance() + ", orientationSexuelle = " + pChambreur.getOrientationSexuelle() + 
-					"where idChambreur = " + pChambreur.getIdClient() +";");
+					"UPDATE chambreur SET nom = '" + pChambreur.getNom() + "', prenom = '" + pChambreur.getPrenom() +
+					"', telephone = '" + pChambreur.getTelephone() + "', adresse = '" + pChambreur.getAdresse() + "', dateNaissance = '" +
+					pChambreur.getDateNaissance() + "', orientationSexuelle = '" + pChambreur.getOrientationSexuelle() + 
+					"' WHERE idChambreur = " + pChambreur.getIdClient() +";");
 			System.out.println(statut);
 		}
 		catch(SQLException e){
@@ -155,9 +154,9 @@ public class DB {
 		try{
 			
 			int statut = statement.executeUpdate(
-					"update reservation set idChambreur = " + reserv.getIdChambreur() + ", noChambre = " + reserv.getNoChambre() +
-					", dateDebut = " + reserv.getDateDebut().toString() + ", dateFin = " + reserv.getDateFin().toString() + 
-					"where idReservation = " + reserv.getIdReservation() +";");
+					"UPDATE reservation SET idChambreur = '" + reserv.getIdChambreur() + "', noChambre = '" + reserv.getNoChambre() +
+					"', dateDebut = '" + reserv.getDateDebut().toString() + "', dateFin = '" + reserv.getDateFin().toString() + 
+					"' WHERE idReservation = " + reserv.getIdReservation() + ";");
 			System.out.println(statut);
 		}
 		catch(SQLException e){
@@ -173,7 +172,7 @@ public class DB {
 	public void deleteChambreur(Chambreur chambreur){
 		
 		try{
-			
+		
 			int statut = statement.executeUpdate(
 					"DELETE from chambreur WHERE idChambreur = " + chambreur.getIdClient());
 		}

@@ -1,9 +1,8 @@
 package control;
 
 import java.net.URL;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,15 +12,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.InputEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import model.Chambreur;
 import model.Client;
-import model.DB;
 import model.DataClient;
 import model.FormatCellule;
+import model.Reservation;
 
 
 public class FXMLControllerTP3 implements Initializable{
@@ -87,16 +85,17 @@ public class FXMLControllerTP3 implements Initializable{
     		client.openAndConnectClientSocket();
     		connection = true;
     		gererDisableBouttons();
-    		connectionButton.setText("Se deconnection");
+    		connectionButton.setText("Se deconnecter");
     		tableviewClients.setItems(DataClient.getInstance().getListeObsChambreur());
     		tableviewReservations.setItems(DataClient.getInstance().getListeObsReservation());
     		
     	}
     	else
     	{	
-    		connectionButton.setText("Se connection");
+    		connectionButton.setText("Se connecter");
     		connection = false;
     		gererDisableBouttons();
+    		client.closeConnection();
     		
     	}
     	
@@ -131,8 +130,25 @@ public class FXMLControllerTP3 implements Initializable{
     }
     
     @FXML
-    void ajouterReservation() {
-
+    void ajouterReservation() throws Exception {
+    	
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource(
+				"../view/ajouterReservation.fxml"));
+    	VBox root = (VBox) loader.load();
+    	FXMLController_AjouterReservation subController = (FXMLController_AjouterReservation)loader.getController();
+    	subController.setMainController(this);
+    	subController.setMainStage(mainStage);
+    	subController.setClient(client);
+    	
+    	subStage = new Stage();
+    	Scene scene = new Scene(root);
+    	subStage.setScene(scene);
+    	subStage.show();
+    	subStage.setResizable(false); 
+    	
+    	setOnCloseEvent(subStage);
+    	
+    	mainStage.getScene().getRoot().setDisable(true);
     }
 
     @FXML
@@ -161,8 +177,32 @@ public class FXMLControllerTP3 implements Initializable{
     	mainStage.getScene().getRoot().setDisable(true);
     }
     
-   
-
+    @FXML
+    void consultModifReserv() throws Exception{
+    	
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource(
+				"../view/consultationReservation.fxml"));
+    	VBox root = (VBox) loader.load();
+    	FXMLController_ConsultModifReservation subController = (FXMLController_ConsultModifReservation)loader.getController();
+    	subController.setMainController(this);
+    	subController.setMainStage(mainStage);
+    	subController.setClient(client);
+    	Reservation reserv = getSelectedReservation();
+    	subController.setReservation(reserv);
+    	
+    	subStage = new Stage();
+    	Scene scene = new Scene(root);
+    	subStage.setScene(scene);
+    	subStage.show();
+    	subStage.setResizable(false); 
+    	
+    	setOnCloseEvent(subStage);
+    	setReservationFields(subController, reserv);
+    	
+    	//mainStage.addEventFilter(InputEvent.ANY, inputEventBlockHandler);
+    	mainStage.getScene().getRoot().setDisable(true);
+    }
+    
 	private void setClientFields(FXMLController_ConsultModifClient subController, Chambreur chambreur)
 	{
 		subController.getTextFieldNom().setText(chambreur.getNom());
@@ -170,19 +210,26 @@ public class FXMLControllerTP3 implements Initializable{
 		subController.getTextFieldId().setText(String.valueOf(chambreur.getIdClient()));
 		subController.getTextFieldAdresse().setText(chambreur.getAdresse());
 		subController.getTextFieldTelephone().setText(chambreur.getTelephone());
-		subController.getTextFieldDateNaissance().setText(chambreur.getDateNaissance().toString());
+		subController.getDatePickerDateNaissance().setValue(chambreur.getDateNaissance());
 		subController.getTextFieldOrientSex().setText(chambreur.getOrientationSexuelle());
+	}
+	
+	private void setReservationFields(FXMLController_ConsultModifReservation subController, Reservation reserv){
+		
+		subController.getTextFieldIdReserv().setText(String.valueOf(reserv.getIdReservation()));
+		subController.getTextFieldIdClient().setText(String.valueOf(reserv.getIdChambreur()));
+		subController.getTextFieldNoChambre().setText(String.valueOf(reserv.getNoChambre()));
+		subController.getDateDebutPicker().setValue(reserv.getDateDebut());
+		subController.getDateFinPicker().setValue(reserv.getDateFin());
 	}
 
 	private Chambreur getSelectedChambreur()
 	{
 		int idClientSelected = tableviewClients.getSelectionModel().getSelectedItem().getIdClient();
-		System.out.println(idClientSelected);
 		for (Chambreur chambreur : DataClient.getInstance().getListeChambreur())
-		{	System.out.println("getidclient:" + chambreur.getNom());
+		{	
 			if(chambreur.getIdClient() == idClientSelected)
 			{
-				System.out.println("allo");
 				return chambreur;
 			}
 		}
@@ -190,6 +237,22 @@ public class FXMLControllerTP3 implements Initializable{
 		return null;
 	}
 
+	private Reservation getSelectedReservation(){
+		
+		int noChambreSelected = tableviewReservations.getSelectionModel().getSelectedItem().getNoChambre();
+		LocalDate dateDebutSelected = LocalDate.parse(tableviewReservations.getSelectionModel().getSelectedItem().getDateDebut());
+		LocalDate dateFinSelected = LocalDate.parse(tableviewReservations.getSelectionModel().getSelectedItem().getDateFin());
+		for(Reservation reservation : DataClient.getInstance().getListeReservation()){
+			
+			if(reservation.getNoChambre() == noChambreSelected && reservation.getDateDebut().equals(dateDebutSelected) &&
+					reservation.getDateFin().equals(dateFinSelected)){
+
+				return reservation;
+			}
+		}
+		return null;
+	}
+	
 	private void setOnCloseEvent(Stage subStage2)
 	{
     	subStage.setOnCloseRequest(new EventHandler<WindowEvent>()
@@ -206,17 +269,16 @@ public class FXMLControllerTP3 implements Initializable{
 	}
 
 	protected void closeSubWindow()
-    {  	
+    {  
     	mainStage.getScene().getRoot().setDisable(false);
     	subStage.hide();
-    	client.receiveListChambreur(client.getSocket());// TROUVER UN MOYEN DE METTRE A JOUR LA LISTE DES TABLEVIEW LORSQU'UNE subWindow est fermée***********************************************************
-    	client.receiveListReservation(client.getSocket());
     }
-
-    @FXML
-    void consultModifReserv() {
-    	
-    }
+	
+	protected void updateLists()
+	{
+		client.receiveListChambreur();
+    	client.receiveListReservation();
+	}
 
     private void setFormatCell() 
     {		

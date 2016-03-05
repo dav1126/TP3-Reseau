@@ -33,8 +33,8 @@ public class Client {
 		
 			client.startHandshake();
 			
-			receiveListChambreur(client);
-			receiveListReservation(client);
+			receiveListChambreur();
+			receiveListReservation();
 			
 		} catch (IOException e){
 			
@@ -66,8 +66,9 @@ public class Client {
 				msg += chambreur.getTelephone() + ";";
 				msg += chambreur.getDateNaissance() + ";";
 				msg += chambreur.getOrientationSexuelle();
+				System.out.println(msg);
 			}
-			else
+			else if (reserv != null)
 			{
 				msg += reserv.getIdReservation() + ";";
 				msg += reserv.getIdChambreur() + ";";
@@ -75,8 +76,8 @@ public class Client {
 				msg += reserv.getDateDebut().toString() + ";";
 				msg += reserv.getDateFin().toString();
 			}
-			
-			msg += CODE_FIN_TRANSMISSION + "\n";
+			System.out.println(msg);
+			msg += "\n";
 			writer.write(msg);
 			writer.flush();	
 		} 
@@ -89,6 +90,10 @@ public class Client {
 	public void closeConnection(){
 		
 		try {
+			DataClient.getInstance().listeChambreur.clear();
+			DataClient.getInstance().listeObsChambreur.clear();
+			DataClient.getInstance().listeReservation.clear();
+			DataClient.getInstance().listeObsReservation.clear();
 			client.close();
 			System.out.println("FERMER CLIENT");
 		} catch (IOException e) {
@@ -97,12 +102,12 @@ public class Client {
 		}
 	}
 
-	public void receiveListChambreur(SSLSocket c) {
+	public void receiveListChambreur() {
 		DataClient.getInstance().getListeObsChambreur().clear();
 		DataClient.getInstance().getListeChambreur().clear();
 		try {
 			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(c.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			
 			String line;
 			int compteur = 0;
@@ -141,12 +146,12 @@ public class Client {
 		}
 	}
 	
-	public void receiveListReservation(SSLSocket c) {
+	public void receiveListReservation() {
 		DataClient.getInstance().getListeObsReservation().clear();
 		DataClient.getInstance().getListeReservation().clear();
 		try {
 			
-			BufferedReader reader = new BufferedReader(new InputStreamReader(c.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			
 			String line;
 			int compteur = 0;
@@ -179,10 +184,5 @@ public class Client {
 
 			e.printStackTrace();
 		}
-	}
-	
-	public SSLSocket getSocket()
-	{
-		return client;
 	}
 }

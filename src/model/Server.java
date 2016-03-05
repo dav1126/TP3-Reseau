@@ -75,58 +75,66 @@ public class Server {
 	private void waitForDBRequest(SSLSocket client)
 	{
 		Thread thread = new Thread(() ->
-		{
-			try 
-			{			
-				BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));			
-				String msgRecu = reader.readLine();
-				String[] msgRecuSplit = msgRecu.split(";");
-				Chambreur chambreur = new Chambreur();
-				Reservation reserv = new Reservation();
-				if (msgRecuSplit[0].equals("1") || msgRecuSplit[0].equals("2") || msgRecuSplit[0].equals("3"))
-				{
-					chambreur.setIdClient(Integer.parseInt(msgRecuSplit[1]));
-					chambreur.setNom(msgRecuSplit[2]);
-					chambreur.setPrenom(msgRecuSplit[3]);
-					chambreur.setAdresse(msgRecuSplit[4]);
-					chambreur.setTelephone(msgRecuSplit[5]);
-					chambreur.setOrientationSexuelle(msgRecuSplit[6]);
-				}
-				else
-				{
-					reserv.setIdReservation(Integer.parseInt(msgRecuSplit[1]));
-					reserv.setIdChambreur(Integer.parseInt(msgRecuSplit[2]));
-					reserv.setNoChambre(Integer.parseInt(msgRecuSplit[3]));
-					reserv.setDateDebut(LocalDate.parse(msgRecuSplit[4]));
-					reserv.setDateFin(LocalDate.parse(msgRecuSplit[5]));
-				}
-				
-				switch(msgRecuSplit[0])
-				{
-					case "1":
-						DB.getInstance().insertChambreur(chambreur);
-						break;
-					case "2":
-						DB.getInstance().modifChambreur(chambreur);
-						break;
-					case "3":
-						DB.getInstance().deleteChambreur(chambreur);
-						break;
-					case "4":
-						DB.getInstance().insertReservation(reserv);
-						break;
-					case "5":
-						DB.getInstance().modifReservation(reserv);
-						break;
-					case "6":
-						DB.getInstance().deleteReservation(reserv);
-						break;					
+			{
+					try 
+					{
+						while (true)
+						{
+						
+						BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));	
+						String msgRecu = reader.readLine();
+						String[] msgRecuSplit = msgRecu.split(";");
+						Chambreur chambreur = new Chambreur();
+						Reservation reserv = new Reservation();
+						if (msgRecuSplit[0].equals("1") || msgRecuSplit[0].equals("2") || msgRecuSplit[0].equals("3"))
+						{
+							chambreur.setIdClient(Integer.parseInt(msgRecuSplit[1]));
+							chambreur.setNom(msgRecuSplit[2]);
+							chambreur.setPrenom(msgRecuSplit[3]);
+							chambreur.setAdresse(msgRecuSplit[4]);
+							chambreur.setTelephone(msgRecuSplit[5]);
+							chambreur.setDateNaissance(LocalDate.parse(msgRecuSplit[6]));
+							chambreur.setOrientationSexuelle(msgRecuSplit[7]);
+						}
+						else if (msgRecuSplit[0].equals("4") || msgRecuSplit[0].equals("5") || msgRecuSplit[0].equals("6"))
+						{
+							reserv.setIdReservation(Integer.parseInt(msgRecuSplit[1]));
+							reserv.setIdChambreur(Integer.parseInt(msgRecuSplit[2]));
+							reserv.setNoChambre(Integer.parseInt(msgRecuSplit[3]));
+							reserv.setDateDebut(LocalDate.parse(msgRecuSplit[4]));
+							reserv.setDateFin(LocalDate.parse(msgRecuSplit[5]));
+						}
+						switch(msgRecuSplit[0])
+						{
+							case "1":
+								DB.getInstance().insertChambreur(chambreur);
+								break;
+							case "2":
+								DB.getInstance().modifChambreur(chambreur);
+								break;
+							case "3":
+								DB.getInstance().deleteChambreur(chambreur);
+								break;
+							case "4":
+								DB.getInstance().insertReservation(reserv);
+								break;
+							case "5":
+								DB.getInstance().modifReservation(reserv);
+								break;
+							case "6":
+								DB.getInstance().deleteReservation(reserv);
+								break;
+						}
+						
+						sendListChambreur(client);
+						sendListReservation(client);
 				}
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
 				System.out.println("*****Client déconnecté*****");
 			}
+			
 		});
 		thread.start();
 	}

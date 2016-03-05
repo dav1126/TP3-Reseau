@@ -52,9 +52,9 @@
             <Label text="Adresse" GridPane.rowIndex="4" />
             <Label text="Date de naissance" GridPane.rowIndex="5" />
             <Label text="Orientation sexuelle" GridPane.rowIndex="6" />
-            <TextField fx:id="textFieldDateNaissance" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <TextField fx:id="textFieldOrientSex" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <HBox prefHeight="100.0" prefWidth="200.0" />
+            <DatePicker fx:id="datePicker" disable="true" editable="false" prefHeight="25.0" prefWidth="188.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
       </GridPane>
       <HBox alignment="CENTER" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="200.0">

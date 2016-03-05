@@ -9,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.Chambreur;
 import model.Client;
-import model.DB;
 import model.DataClient;
 import model.FormatCellule;
 
@@ -56,9 +55,13 @@ public class FXMLController_AjouterClient {
     @FXML
     void ajouter() 
     {
-    	Chambreur chambreur = new Chambreur(textFieldNom.getText(), textFieldPrenom.getText(), textFieldTelephone.getText(), textFieldAdresse.getText(), datePicker.getValue(), textFieldOrientSex.getText());
-    	DB.getInstance().insertChambreur(chambreur);
+    	Chambreur chambreur = new Chambreur(textFieldNom.getText(), textFieldPrenom.getText(), 
+    			textFieldTelephone.getText(), textFieldAdresse.getText(), 
+    			datePicker.getValue(), textFieldOrientSex.getText());
+    	client.sendRequestToServer(1, chambreur, null);
+    	mainController.updateLists();
     	mainController.closeSubWindow();
+    	
     }
 
     @FXML

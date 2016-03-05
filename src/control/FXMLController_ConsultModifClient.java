@@ -3,6 +3,7 @@ package control;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -31,7 +32,7 @@ public class FXMLController_ConsultModifClient
     private TextField textFieldAdresse;
 
     @FXML
-    private TextField textFieldDateNaissance;
+    private DatePicker datePicker;
 
     @FXML
     private TextField textFieldOrientSex;
@@ -78,7 +79,12 @@ public class FXMLController_ConsultModifClient
     @FXML
     void enregistrer() 
     {
-    	
+    	Chambreur chambreur = new Chambreur(Integer.parseInt(textFieldId.getText()), textFieldNom.getText(), textFieldPrenom.getText(), 
+    			textFieldTelephone.getText(), textFieldAdresse.getText(), 
+    			datePicker.getValue(), textFieldOrientSex.getText());
+    	client.sendRequestToServer(2, chambreur, null);
+    	mainController.updateLists();
+    	mainController.closeSubWindow(); 
     }
 
     @FXML
@@ -88,26 +94,24 @@ public class FXMLController_ConsultModifClient
     }
     
     @FXML
-    void supprimerClient(ActionEvent event) {
-    	System.out.println("testest");
-    	FormatCellule fcTemp = null;
-    	for(FormatCellule fc:DataClient.getInstance().getListeObsChambreur())
-    	{
-    		if(fc.getIdClient() ==
-    				chambreur.getIdClient())
-    		{			
-    			fcTemp = fc;
-    		}
-    	}   	
-    	mainController.closeSubWindow();
-    	client.sendRequestToServer(3, chambreur, null);    	
+    void supprimerClient() {
+//    	FormatCellule fcTemp = null;
+//    	for(FormatCellule fc:DataClient.getInstance().getListeObsChambreur())
+//    	{
+//    		if(fc.getIdClient() ==
+//    				chambreur.getIdClient())
+//    		{			
+//    			fcTemp = fc;
+//    		}
+//    	} 
+    	client.sendRequestToServer(3, chambreur, null);
+    	mainController.updateLists();
+    	mainController.closeSubWindow();  
     }
     
 	public void setMainController(FXMLControllerTP3 mainController)
 	{
-    	System.out.println(mainController);
 		this.mainController = mainController;
-    	System.out.println(this.mainController);
 	}
 	
 	public void initialize()
@@ -125,10 +129,9 @@ public class FXMLController_ConsultModifClient
 			buttonEnregistrer.setDisable(disable);
 			getTextFieldNom().setDisable(disable);
 			getTextFieldPrenom().setDisable(disable);
-			getTextFieldId().setDisable(disable);
 			getTextFieldAdresse().setDisable(disable);
 			getTextFieldTelephone().setDisable(disable);
-			getTextFieldDateNaissance().setDisable(disable);
+			getDatePickerDateNaissance().setDisable(disable);
 			getTextFieldOrientSex().setDisable(disable);
 			
 		});
@@ -143,7 +146,7 @@ public class FXMLController_ConsultModifClient
 		getTextFieldId().setText(String.valueOf(chambreur.getIdClient()));
 		getTextFieldAdresse().setText(chambreur.getAdresse());
 		getTextFieldTelephone().setText(chambreur.getTelephone());
-		getTextFieldDateNaissance().setText(chambreur.getDateNaissance().toString());
+		getDatePickerDateNaissance().setValue(chambreur.getDateNaissance());
 		getTextFieldOrientSex().setText(chambreur.getOrientationSexuelle());
 	}
 	
@@ -192,9 +195,9 @@ public class FXMLController_ConsultModifClient
 		return textFieldAdresse;
 	}
 
-	public TextField getTextFieldDateNaissance()
+	public DatePicker getDatePickerDateNaissance()
 	{
-		return textFieldDateNaissance;
+		return datePicker;
 	}
 
 	public TextField getTextFieldOrientSex()
