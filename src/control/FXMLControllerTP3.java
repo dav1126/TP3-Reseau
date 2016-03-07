@@ -1,8 +1,11 @@
 package control;
 
 import java.net.URL;
+import java.util.logging.Logger;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +14,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -73,7 +78,8 @@ public class FXMLControllerTP3 implements Initializable{
     private Stage mainStage;
     
     private Stage subStage;
-    
+      
+	Logger logger;
     //EventHandler<InputEvent> inputEventBlockHandler;
     
     @FXML
@@ -82,6 +88,7 @@ public class FXMLControllerTP3 implements Initializable{
     	if(connection == false)
     	{   		
     		client = new Client();
+    		client.setLogger(logger);
     		client.openAndConnectClientSocket();
     		connection = true;
     		gererDisableBouttons();
@@ -111,7 +118,7 @@ public class FXMLControllerTP3 implements Initializable{
     void ajouterClient() throws Exception 
     {
     	FXMLLoader loader = new FXMLLoader(getClass().getResource(
-				"../view/ajouterClient.fxml"));
+				"/view/ajouterClient.fxml"));
     	VBox root = (VBox) loader.load();
     	FXMLController_AjouterClient subController = (FXMLController_AjouterClient)loader.getController();
     	subController.setMainController(this);
@@ -124,7 +131,7 @@ public class FXMLControllerTP3 implements Initializable{
     	subStage.show();
     	subStage.setResizable(false); 
     	
-    	setOnCloseEvent(subStage);
+    	setOnCloseEvent(subStage, null, null);
     	
     	mainStage.getScene().getRoot().setDisable(true);
     }
@@ -133,7 +140,7 @@ public class FXMLControllerTP3 implements Initializable{
     void ajouterReservation() throws Exception {
     	
     	FXMLLoader loader = new FXMLLoader(getClass().getResource(
-				"../view/ajouterReservation.fxml"));
+				"/view/ajouterReservation.fxml"));
     	VBox root = (VBox) loader.load();
     	FXMLController_AjouterReservation subController = (FXMLController_AjouterReservation)loader.getController();
     	subController.setMainController(this);
@@ -146,61 +153,91 @@ public class FXMLControllerTP3 implements Initializable{
     	subStage.show();
     	subStage.setResizable(false); 
     	
-    	setOnCloseEvent(subStage);
+    	setOnCloseEvent(subStage, null, null);
     	
     	mainStage.getScene().getRoot().setDisable(true);
     }
 
     @FXML
     void consultModifClient() throws Exception
-    {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource(
-				"../view/consultationClient.fxml"));
-    	VBox root = (VBox) loader.load();
-    	FXMLController_ConsultModifClient subController = (FXMLController_ConsultModifClient)loader.getController();
-    	subController.setMainController(this);
-    	subController.setMainStage(mainStage);
-    	subController.setClient(client);
+    {   	
+    	
     	Chambreur chambreur = getSelectedChambreur();
-    	subController.setChambreur(chambreur);
-    	
-    	subStage = new Stage();
-    	Scene scene = new Scene(root);
-    	subStage.setScene(scene);
-    	subStage.show();
-    	subStage.setResizable(false); 
-    	
-    	setOnCloseEvent(subStage);
-    	setClientFields(subController, chambreur);
-    	
-    	//mainStage.addEventFilter(InputEvent.ANY, inputEventBlockHandler);
-    	mainStage.getScene().getRoot().setDisable(true);
+    	client.sendRequestToServer(7, chambreur,null);
+    	if (!client.receiveConsultConfirmation())
+    	{
+    		FXMLLoader loader = new FXMLLoader(getClass().getResource(
+    				"/view/consultationClient.fxml"));
+        	VBox root = (VBox) loader.load();
+        	FXMLController_ConsultModifClient subController = (FXMLController_ConsultModifClient)loader.getController();
+        	subController.setMainController(this);
+        	subController.setMainStage(mainStage);
+        	subController.setClient(client);
+        	subController.setChambreur(chambreur);
+        	
+        	
+        	subStage = new Stage();
+        	Scene scene = new Scene(root);
+        	subStage.setScene(scene);
+        	subStage.show();
+        	subStage.setResizable(false); 
+        	
+        	setOnCloseEvent(subStage, chambreur, null);
+        	setClientFields(subController, chambreur);
+        	
+        	//mainStage.addEventFilter(InputEvent.ANY, inputEventBlockHandler);
+        	mainStage.getScene().getRoot().setDisable(true);
+    	}
+    	else
+    	{
+    		showConsultAlert();
+    	}
     }
     
-    @FXML
+    private void showConsultAlert()
+	{
+    	Alert alert = new Alert(AlertType.WARNING);
+		alert.setTitle("Avertissement");
+		alert.setHeaderText(null);
+		alert.setContentText("Ce dossier est déjà en consultation par un autre usager.");
+
+		alert.showAndWait();
+		
+	}
+
+	@FXML
     void consultModifReserv() throws Exception{
     	
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource(
-				"../view/consultationReservation.fxml"));
-    	VBox root = (VBox) loader.load();
-    	FXMLController_ConsultModifReservation subController = (FXMLController_ConsultModifReservation)loader.getController();
-    	subController.setMainController(this);
-    	subController.setMainStage(mainStage);
-    	subController.setClient(client);
-    	Reservation reserv = getSelectedReservation();
-    	subController.setReservation(reserv);
-    	
-    	subStage = new Stage();
-    	Scene scene = new Scene(root);
-    	subStage.setScene(scene);
-    	subStage.show();
-    	subStage.setResizable(false); 
-    	
-    	setOnCloseEvent(subStage);
-    	setReservationFields(subController, reserv);
-    	
-    	//mainStage.addEventFilter(InputEvent.ANY, inputEventBlockHandler);
-    	mainStage.getScene().getRoot().setDisable(true);
+		Reservation reserv = getSelectedReservation();
+		client.sendRequestToServer(8, null, reserv);
+		if (!client.receiveConsultConfirmation())
+		{
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(
+					"/view/consultationReservation.fxml"));
+	    	VBox root = (VBox) loader.load();
+	    	FXMLController_ConsultModifReservation subController = (FXMLController_ConsultModifReservation)loader.getController();
+	    	subController.setMainController(this);
+	    	subController.setMainStage(mainStage);
+	    	subController.setClient(client);
+	    	
+	    	subController.setReservation(reserv);
+	    	
+	    	subStage = new Stage();
+	    	Scene scene = new Scene(root);
+	    	subStage.setScene(scene);
+	    	subStage.show();
+	    	subStage.setResizable(false); 
+	    	
+	    	setOnCloseEvent(subStage, null, reserv);
+	    	setReservationFields(subController, reserv);
+	    	
+	    	//mainStage.addEventFilter(InputEvent.ANY, inputEventBlockHandler);
+	    	mainStage.getScene().getRoot().setDisable(true);
+		}
+		else
+		{
+			showConsultAlert();
+		}
     }
     
 	private void setClientFields(FXMLController_ConsultModifClient subController, Chambreur chambreur)
@@ -253,7 +290,7 @@ public class FXMLControllerTP3 implements Initializable{
 		return null;
 	}
 	
-	private void setOnCloseEvent(Stage subStage2)
+	private void setOnCloseEvent(Stage subStage2, Chambreur chambreur, Reservation reservation)
 	{
     	subStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 		{
@@ -261,6 +298,10 @@ public class FXMLControllerTP3 implements Initializable{
 			public void handle(WindowEvent event)
 			{
 				event.consume();
+				if (chambreur != null)
+					client.sendRequestToServer(91, chambreur, null);
+				else if (reservation != null)
+					client.sendRequestToServer(92, null, reservation);
 				closeSubWindow();		
 			}
 	
@@ -270,7 +311,7 @@ public class FXMLControllerTP3 implements Initializable{
 
 	protected void closeSubWindow()
     {  
-    	mainStage.getScene().getRoot().setDisable(false);
+		mainStage.getScene().getRoot().setDisable(false);
     	subStage.hide();
     }
 	
@@ -321,6 +362,11 @@ public class FXMLControllerTP3 implements Initializable{
 	public void setStage(Stage mainStage)
 	{
 		this.mainStage = mainStage;
+	}
+	
+	public void setLogger(Logger logger)
+	{
+		this.logger = logger;
 	}
 	
 }

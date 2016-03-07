@@ -134,6 +134,30 @@ public class DB {
 		}
 	}
 	
+	protected void removeFromConsultList(Chambreur pChambreur)
+	{
+		Chambreur chambreurTemp = null;
+		for (Chambreur chambreur : DataServer.getInstance().getListeConsultChambreur())
+		{
+			if (chambreur.getIdClient() == pChambreur.getIdClient())
+				chambreurTemp = chambreur;
+				
+		}
+		if (chambreurTemp != null)
+			DataServer.getInstance().getListeConsultChambreur().remove(chambreurTemp);
+	}
+	
+	protected void removeFromConsultList(Reservation pReserv)
+	{
+		Reservation reservTemp = null;
+		for (Reservation reserv : DataServer.getInstance().getListeConsultReservation())
+		{
+			if (reserv.getIdReservation() == pReserv.getIdReservation())
+				reservTemp = reserv;			
+		}
+		DataServer.getInstance().getListeConsultReservation().remove(reservTemp);
+	}
+
 	public void modifChambreur(Chambreur pChambreur){
 		try{
 			System.out.println(pChambreur.getIdClient());

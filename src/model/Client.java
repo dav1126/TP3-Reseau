@@ -1,6 +1,8 @@
 package model;
 
 import java.io.BufferedReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,8 +19,10 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Client {
 	
+	Logger logger;
 	SSLSocket client;
 	private final String CODE_FIN_TRANSMISSION = "CODEDEFINDETRANSMISSIONALPHAROMEO*$??62863*?/0";
+	InetAddress serveur;
 
 	public void openAndConnectClientSocket()
 	{
@@ -28,8 +32,9 @@ public class Client {
 		try{
 			
 			// Création du socket:
-			InetAddress localHost = InetAddress.getLocalHost();
-			client = (SSLSocket) f.createSocket(localHost, 55556);
+			serveur = InetAddress.getByName("172.18.10.21");
+			client = (SSLSocket) f.createSocket(serveur, 55556);
+			logger.log(Level.INFO, "Connection a:" + serveur.getHostAddress());
 		
 			client.startHandshake();
 			
@@ -87,6 +92,27 @@ public class Client {
 		}
 	}
 	
+	public boolean receiveConsultConfirmation()
+	{
+		Boolean enConsult = false;
+		BufferedReader reader;
+		try
+		{
+			reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+			String msgRecu = reader.readLine();
+			System.out.println("msgRecu: " +msgRecu);
+			if (msgRecu.equals("1"))
+				enConsult = true;
+				
+		} catch (IOException e)
+		{
+			
+			e.printStackTrace();
+		}	
+		System.out.println("Confirm recu: " + enConsult);
+		return enConsult;
+	}
+	
 	public void closeConnection(){
 		
 		try {
@@ -96,6 +122,7 @@ public class Client {
 			DataClient.getInstance().listeObsReservation.clear();
 			client.close();
 			System.out.println("FERMER CLIENT");
+			logger.log(Level.INFO, "Déconnection de:" + serveur.getHostAddress());
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -184,5 +211,10 @@ public class Client {
 
 			e.printStackTrace();
 		}
+	}
+	
+	public void setLogger(Logger logger)
+	{
+		this.logger = logger;
 	}
 }

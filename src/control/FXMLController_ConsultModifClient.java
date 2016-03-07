@@ -65,7 +65,7 @@ public class FXMLController_ConsultModifClient
     @FXML
     void quitter() 
     {
-
+    	client.sendRequestToServer(91, chambreur, null);
     	mainController.closeSubWindow();
     }
     
@@ -84,6 +84,7 @@ public class FXMLController_ConsultModifClient
     			datePicker.getValue(), textFieldOrientSex.getText());
     	client.sendRequestToServer(2, chambreur, null);
     	mainController.updateLists();
+    	client.sendRequestToServer(91, chambreur, null);
     	mainController.closeSubWindow(); 
     }
 
@@ -106,6 +107,7 @@ public class FXMLController_ConsultModifClient
 //    	} 
     	client.sendRequestToServer(3, chambreur, null);
     	mainController.updateLists();
+    	client.sendRequestToServer(91, chambreur, null);
     	mainController.closeSubWindow();  
     }
     

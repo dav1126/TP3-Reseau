@@ -10,6 +10,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.security.KeyStore;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -22,6 +29,10 @@ public class Server {
 	
 	SSLServerSocket serveur;
 	private final String CODE_FIN_TRANSMISSION = "CODEDEFINDETRANSMISSIONALPHAROMEO*$??62863*?/0";
+	private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+	Handler fileHandler = null;
+	Formatter simpleFormatter = null;
+	String homeDirectoryPath = System.getProperty("user.home");
 	
 	public void openServerSocket(){
 		
@@ -39,6 +50,29 @@ public class Server {
 			sc.init(kmf.getKeyManagers(), null, null);
 			SSLServerSocketFactory ssf = sc.getServerSocketFactory();
 			serveur = (SSLServerSocket) ssf.createServerSocket(55556);
+			
+			//Logging
+			// Creating FileHandler
+			fileHandler = new FileHandler(homeDirectoryPath + "/tp3.log" );
+
+			// Creating SimpleFormatter
+			simpleFormatter = new SimpleFormatter();
+
+			// Assigning handler to logger
+			LOGGER.addHandler(fileHandler);
+
+			// Logging message of Level info (this should be publish in the default format i.e. XMLFormat)
+			LOGGER.info("Finnest message: Logger with DEFAULT FORMATTER");
+
+			// Setting formatter to the handler
+			fileHandler.setFormatter(simpleFormatter);
+
+			// Setting Level to ALL
+			fileHandler.setLevel(Level.ALL);
+			LOGGER.setLevel(Level.ALL);
+
+			// Logging message of Level finest (this should be publish in the simple format)
+			LOGGER.finest("Finnest message: Logger with SIMPLE FORMATTER");
 		}
 		
 		catch(Exception ex){
@@ -56,12 +90,14 @@ public class Server {
 				try {
 					
 					SSLSocket client = (SSLSocket) serveur.accept();
+					LOGGER.log(Level.INFO, "Connection de:" + client.getInetAddress().getHostAddress());
 					
 					sendListChambreur(client);
 					sendListReservation(client);
 					waitForDBRequest(client);
 					
-				} catch (IOException e) {
+				} catch (IOException e) 
+				{
 		
 					e.printStackTrace();
 				}
@@ -86,7 +122,8 @@ public class Server {
 						String[] msgRecuSplit = msgRecu.split(";");
 						Chambreur chambreur = new Chambreur();
 						Reservation reserv = new Reservation();
-						if (msgRecuSplit[0].equals("1") || msgRecuSplit[0].equals("2") || msgRecuSplit[0].equals("3"))
+						System.out.println("msgRecuSplit: " +msgRecuSplit[0]);
+						if (msgRecuSplit[0].equals("1") || msgRecuSplit[0].equals("2") || msgRecuSplit[0].equals("3") || msgRecuSplit[0].equals("7") || msgRecuSplit[0].equals("91"))
 						{
 							chambreur.setIdClient(Integer.parseInt(msgRecuSplit[1]));
 							chambreur.setNom(msgRecuSplit[2]);
@@ -96,7 +133,7 @@ public class Server {
 							chambreur.setDateNaissance(LocalDate.parse(msgRecuSplit[6]));
 							chambreur.setOrientationSexuelle(msgRecuSplit[7]);
 						}
-						else if (msgRecuSplit[0].equals("4") || msgRecuSplit[0].equals("5") || msgRecuSplit[0].equals("6"))
+						else if (msgRecuSplit[0].equals("4") || msgRecuSplit[0].equals("5") || msgRecuSplit[0].equals("6") || msgRecuSplit[0].equals("8") || msgRecuSplit[0].equals("92"))
 						{
 							reserv.setIdReservation(Integer.parseInt(msgRecuSplit[1]));
 							reserv.setIdChambreur(Integer.parseInt(msgRecuSplit[2]));
@@ -124,19 +161,86 @@ public class Server {
 							case "6":
 								DB.getInstance().deleteReservation(reserv);
 								break;
+							case "7":
+								boolean enConsult1 = checkIfChambreurIsInConsult(chambreur.getIdClient());
+								if (!enConsult1)
+								{
+									System.out.println("ajout chambreur: " + chambreur.getIdClient());
+									DataServer.getInstance().getListeConsultChambreur().add(chambreur);
+								}
+								sendConfirmation(enConsult1, client);
+								break;
+							case "8":
+								boolean enConsult2 = checkIfReservIsInConsult(reserv.getIdReservation());
+								if (!enConsult2)
+								{
+									System.out.println("ajout reserv" + reserv.getIdReservation());
+									DataServer.getInstance().getListeConsultReservation().add(reserv);
+								}
+								sendConfirmation(enConsult2, client);
+								break;
+							case "91":								
+									System.out.println("removechambreur: " + chambreur.getIdClient());
+									DB.getInstance().removeFromConsultList(chambreur);
+									break;
+							case "92":
+									System.out.println("removereserv" + reserv.getIdReservation());
+									DB.getInstance().removeFromConsultList(reserv);
+									break;
+								
 						}
 						
-						sendListChambreur(client);
-						sendListReservation(client);
+						if (!msgRecuSplit[0].equals("7") && !msgRecuSplit[0].equals("8") && !msgRecuSplit[0].equals("91") && !msgRecuSplit[0].equals("92"))
+						{
+							sendListChambreur(client);
+							sendListReservation(client);
+						}
 				}
 			}
 			catch(Exception e)
 			{
+				LOGGER.log(Level.INFO, "Déconnection de:" + client.getInetAddress().getHostAddress());
 				System.out.println("*****Client déconnecté*****");
 			}
 			
 		});
 		thread.start();
+	}
+
+	private void sendConfirmation(Boolean enConsult, SSLSocket client) throws Exception
+	{
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+		
+		String msg = "";
+		if (enConsult)
+			msg = "1\n";
+		else
+			msg = "0\n";
+		System.out.println("msg envoyé: " + msg);
+		writer.write(msg);
+		writer.flush();
+	}
+	
+	private boolean checkIfReservIsInConsult(int reservID)
+	{
+		boolean dejaEnConsultation = false;
+		for (Reservation reserv : DataServer.getInstance().getListeConsultReservation())
+		{
+			if (reserv.getIdReservation() == reservID)
+				dejaEnConsultation = true;
+		}
+		return dejaEnConsultation;
+	}
+
+	private boolean checkIfChambreurIsInConsult(int chambreurID)
+	{
+		boolean dejaEnConsultation = false;
+		for (Chambreur chambreur : DataServer.getInstance().getListeConsultChambreur())
+		{
+			if (chambreur.getIdClient() == chambreurID)
+				dejaEnConsultation = true;
+		}
+		return dejaEnConsultation;		
 	}
 
 	private void sendListChambreur(SSLSocket client) {
@@ -189,5 +293,10 @@ public class Server {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Logger getLogger()
+	{
+		return LOGGER;
 	}
 }
