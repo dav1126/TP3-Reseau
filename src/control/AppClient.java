@@ -18,7 +18,7 @@ import model.Server;
 
 public class AppClient extends Application{
 	
-	private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(AppClient.class.getName());
 	Handler fileHandler = null;
 	Formatter simpleFormatter = null;
 	String homeDirectoryPath = System.getProperty("user.home");
